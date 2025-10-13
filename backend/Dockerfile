@@ -21,15 +21,16 @@ COPY . .
 # Make sure scripts are in PATH
 ENV PATH=/root/.local/bin:$PATH
 
-# Expose port
-EXPOSE 8000
+# Expose port (Cloud Run uses PORT environment variable, defaults to 8080)
+EXPOSE 8080
 
-# Health check
-HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
-    CMD python -c "import requests; requests.get('http://localhost:8000/health')"
+# Set default port if not provided
+ENV PORT=8080
 
-# Run the application with increased limits for file upload
-CMD ["uvicorn", "api:app", "--host", "0.0.0.0", "--port", "8000", "--limit-max-requests", "0", "--timeout-keep-alive", "300"]
+# Run the application
+# Note: --limit-max-requests removed (0 causes immediate shutdown)
+# Cloud Run will use the PORT environment variable
+CMD uvicorn api:app --host 0.0.0.0 --port ${PORT} --timeout-keep-alive 300
 
 
 
