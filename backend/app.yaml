@@ -1,0 +1,26 @@
+# GCP App Engine configuration (alternative to Cloud Run)
+runtime: python311
+
+instance_class: F2
+
+automatic_scaling:
+  target_cpu_utilization: 0.65
+  min_instances: 0
+  max_instances: 10
+
+env_variables:
+  PYTHONUNBUFFERED: "1"
+
+# Environment variables from Secret Manager
+# Note: Secrets should be configured in GCP Console
+# AIRTABLE_API_KEY: ${AIRTABLE_API_KEY}
+# AIRTABLE_BASE_ID: ${AIRTABLE_BASE_ID}
+# AIRTABLE_TABLE_NAME: ${AIRTABLE_TABLE_NAME}
+
+handlers:
+- url: /.*
+  script: auto
+  secure: always
+
+
+
