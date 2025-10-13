@@ -8,7 +8,6 @@ venv
 .env
 *.csv
 *.json
-*.txt
 .git
 .gitignore
 README.md
@@ -18,6 +17,8 @@ htmlcov
 dist
 build
 *.egg-info
+# Output files but NOT requirements.txt
+speaker_report_*.txt
 
 
 
