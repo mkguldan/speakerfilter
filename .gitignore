@@ -30,9 +30,10 @@ wheels/
 
 # Output files
 *.csv
-*.json
-*.txt
 speaker_report_*
+# Exclude output .txt and .json files but NOT requirements.txt or package.json
+speaker_report_*.txt
+speaker_report_*.json
 
 # IDE
 .vscode/
