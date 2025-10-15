@@ -3,8 +3,6 @@ import {
   Paper,
   Box,
   Typography,
-  Button,
-  LinearProgress,
   Alert,
   Chip,
   IconButton,
@@ -17,34 +15,7 @@ function FileUpload({ onFileSelect, selectedFile, onFileClear }) {
   const [dragActive, setDragActive] = useState(false);
   const [fileInfo, setFileInfo] = useState(null);
 
-  const handleDrag = useCallback((e) => {
-    e.preventDefault();
-    e.stopPropagation();
-    if (e.type === "dragenter" || e.type === "dragover") {
-      setDragActive(true);
-    } else if (e.type === "dragleave") {
-      setDragActive(false);
-    }
-  }, []);
-
-  const handleDrop = useCallback((e) => {
-    e.preventDefault();
-    e.stopPropagation();
-    setDragActive(false);
-
-    if (e.dataTransfer.files && e.dataTransfer.files[0]) {
-      handleFile(e.dataTransfer.files[0]);
-    }
-  }, []);
-
-  const handleChange = (e) => {
-    e.preventDefault();
-    if (e.target.files && e.target.files[0]) {
-      handleFile(e.target.files[0]);
-    }
-  };
-
-  const handleFile = (file) => {
+  const handleFile = useCallback((file) => {
     // Check if file is CSV
     if (!file.name.endsWith('.csv')) {
       alert('Please upload a CSV file');
@@ -66,6 +37,33 @@ function FileUpload({ onFileSelect, selectedFile, onFileClear }) {
 
     setFileInfo(info);
     onFileSelect(file);
+  }, [onFileSelect]);
+
+  const handleDrag = useCallback((e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (e.type === "dragenter" || e.type === "dragover") {
+      setDragActive(true);
+    } else if (e.type === "dragleave") {
+      setDragActive(false);
+    }
+  }, []);
+
+  const handleDrop = useCallback((e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setDragActive(false);
+
+    if (e.dataTransfer.files && e.dataTransfer.files[0]) {
+      handleFile(e.dataTransfer.files[0]);
+    }
+  }, [handleFile]);
+
+  const handleChange = (e) => {
+    e.preventDefault();
+    if (e.target.files && e.target.files[0]) {
+      handleFile(e.target.files[0]);
+    }
   };
 
   const handleClear = () => {
@@ -160,16 +158,16 @@ function FileUpload({ onFileSelect, selectedFile, onFileClear }) {
         </Typography>
         <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap', mt: 1 }}>
           {[
-            'Name',
-            'Workshops',
-            "Axel's rating",
-            'Notes speaker calls',
-            "Jelena's comments",
+            'Record Identifier',
+            'Workshops 25',
+            'Axel Input',
+            'Notes Speaker Call',
+            'Scout Comments',
             'Abstract',
             'Company',
             'Region',
-            'IR Speaking engagement',
-            'Activity notes'
+            'IR Speaking Engagements (Title and Event)',
+            'Activity Notes'
           ].map((col) => (
             <Chip key={col} label={col} size="small" variant="outlined" />
           ))}
