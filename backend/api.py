@@ -1,5 +1,6 @@
 """
 FastAPI backend for Speaker Prospect Filtering Tool.
+Handles CSV upload and speaker filtering with NaN-safe processing.
 """
 from fastapi import FastAPI, HTTPException, BackgroundTasks, UploadFile, File
 from fastapi.middleware.cors import CORSMiddleware
