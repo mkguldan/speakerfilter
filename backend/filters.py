@@ -1,6 +1,7 @@
 """
 Filtering logic for categorizing speakers.
 """
+import pandas as pd
 from config import (
     COLUMNS, 
     AXEL_RATING_GOOD, 
@@ -8,6 +9,23 @@ from config import (
     IR_RATING_THRESHOLD
 )
 from text_extractor import TextExtractor
+
+
+def safe_str(value):
+    """
+    Safely convert a value to string, handling NaN and None.
+    
+    Args:
+        value: Any value that might be NaN, None, or other type
+        
+    Returns:
+        str: String representation, or empty string for NaN/None
+    """
+    if value is None:
+        return ''
+    if isinstance(value, float) and pd.isna(value):
+        return ''
+    return str(value)
 
 
 class SpeakerFilter:
@@ -38,20 +56,16 @@ class SpeakerFilter:
         
         for record in records:
             workshops = record.get(COLUMNS['workshops'], '')
-            if not workshops:
-                continue
+            workshops_str = safe_str(workshops)
             
-            # Check if workshops contains the confirmed tag
-            if isinstance(workshops, list):
-                workshops_str = ' '.join(str(w) for w in workshops)
-            else:
-                workshops_str = str(workshops)
+            if not workshops_str:
+                continue
             
             if confirmed_tag.lower() in workshops_str.lower():
                 confirmed.append({
-                    'speaker_name': record.get(COLUMNS['speaker_name'], 'Unknown'),
+                    'speaker_name': safe_str(record.get(COLUMNS['speaker_name'], 'Unknown')),
                     'tag': confirmed_tag,
-                    'company': record.get(COLUMNS['company'], ''),
+                    'company': safe_str(record.get(COLUMNS['company'], '')),
                     'category': 'Confirmed'
                 })
         
@@ -74,14 +88,10 @@ class SpeakerFilter:
         
         for record in records:
             workshops = record.get(COLUMNS['workshops'], '')
-            if not workshops:
-                continue
+            workshops_str = safe_str(workshops)
             
-            # Convert to string for checking
-            if isinstance(workshops, list):
-                workshops_str = ' '.join(str(w) for w in workshops)
-            else:
-                workshops_str = str(workshops)
+            if not workshops_str:
+                continue
             
             workshops_lower = workshops_str.lower()
             
@@ -91,11 +101,10 @@ class SpeakerFilter:
                     continue
                 
                 # Check activity notes for DON'T CONTACT
-                activity_notes = record.get(COLUMNS['activity_notes'], '')
-                if activity_notes:
-                    activity_lower = str(activity_notes).lower()
-                    if "don't contact" in activity_lower or "do not contact" in activity_lower:
-                        continue
+                activity_notes = safe_str(record.get(COLUMNS['activity_notes'], ''))
+                activity_lower = activity_notes.lower()
+                if "don't contact" in activity_lower or "do not contact" in activity_lower:
+                    continue
                 
                 # Apply rating filters
                 if self._passes_rating_filter(record):
@@ -119,22 +128,17 @@ class SpeakerFilter:
         
         for record in records:
             workshops = record.get(COLUMNS['workshops'], '')
-            if not workshops:
-                continue
+            workshops_str = safe_str(workshops)
             
-            # Convert to string for checking
-            if isinstance(workshops, list):
-                workshops_str = ' '.join(str(w) for w in workshops)
-            else:
-                workshops_str = str(workshops)
+            if not workshops_str:
+                continue
             
             if endorsed_tag.lower() in workshops_str.lower():
                 # Check activity notes for DON'T CONTACT
-                activity_notes = record.get(COLUMNS['activity_notes'], '')
-                if activity_notes:
-                    activity_lower = str(activity_notes).lower()
-                    if "don't contact" in activity_lower or "do not contact" in activity_lower:
-                        continue
+                activity_notes = safe_str(record.get(COLUMNS['activity_notes'], ''))
+                activity_lower = activity_notes.lower()
+                if "don't contact" in activity_lower or "do not contact" in activity_lower:
+                    continue
                 
                 # Apply rating filters
                 if self._passes_rating_filter(record):
@@ -213,15 +217,15 @@ class SpeakerFilter:
         Returns:
             dict: Detailed speaker information
         """
-        # Extract all necessary information
-        speaker_name = record.get(COLUMNS['speaker_name'], 'Unknown')
-        company = record.get(COLUMNS['company'], '')
-        notes = record.get(COLUMNS['notes_speaker_calls'], '')
-        jelena_comments = record.get(COLUMNS['jelena_comments'], '')
-        abstract = record.get(COLUMNS['abstract'], '')
-        region = record.get(COLUMNS['region'], '')
-        ir_engagement = record.get(COLUMNS['ir_speaking_engagement'], '')
-        axel_rating = record.get(COLUMNS['axel_rating'], '')
+        # Extract all necessary information with safe string conversion
+        speaker_name = safe_str(record.get(COLUMNS['speaker_name'], 'Unknown'))
+        company = safe_str(record.get(COLUMNS['company'], ''))
+        notes = safe_str(record.get(COLUMNS['notes_speaker_calls'], ''))
+        jelena_comments = safe_str(record.get(COLUMNS['jelena_comments'], ''))
+        abstract = safe_str(record.get(COLUMNS['abstract'], ''))
+        region = safe_str(record.get(COLUMNS['region'], ''))
+        ir_engagement = safe_str(record.get(COLUMNS['ir_speaking_engagement'], ''))
+        axel_rating = safe_str(record.get(COLUMNS['axel_rating'], ''))
         
         # Extract structured information
         in_sum, call_date = self.text_extractor.extract_in_sum_section(notes)
